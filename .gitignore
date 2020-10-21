@@ -70,7 +70,7 @@ builds
 .mould*
 
 # ignore log file
-mould.log
+*.log
 
 .ansible/ansible.cfg
 

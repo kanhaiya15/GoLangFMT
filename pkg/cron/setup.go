@@ -4,15 +4,15 @@ import (
 	"context"
 	"sync"
 
-	"github.com/LambdaTest/mould/config"
-	"github.com/LambdaTest/mould/pkg/lumber"
+	config "github.com/kanhaiya15/GoLangFMT/cfg"
+	"github.com/kanhaiya15/GoLangFMT/pkg/lumber"
 	"github.com/robfig/cron/v3"
 )
 
 var logger lumber.Logger
 
 // Setup initializes all crons on service startup
-func Setup(config *config.Config, ctx context.Context, wg *sync.WaitGroup, initializedLogger lumber.Logger) {
+func Setup(ctx context.Context, config *config.Config, wg *sync.WaitGroup, initializedLogger lumber.Logger) {
 	defer wg.Done()
 
 	logger = initializedLogger

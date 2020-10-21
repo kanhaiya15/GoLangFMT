@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/LambdaTest/mould/cmd"
+	"github.com/kanhaiya15/GoLangFMT/cmd"
 )
 
 // Main function just executes root command `ts`

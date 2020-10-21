@@ -6,23 +6,23 @@ import (
 	"sync"
 	"time"
 
-	"github.com/LambdaTest/mould/internal/middleware"
-	"github.com/LambdaTest/mould/pkg/errs"
-	"github.com/LambdaTest/mould/pkg/lumber"
+	"github.com/kanhaiya15/GoLangFMT/internal/middleware"
+	"github.com/kanhaiya15/GoLangFMT/pkg/errs"
+	"github.com/kanhaiya15/GoLangFMT/pkg/lumber"
 	"github.com/lestrrat-go/backoff"
 
 	"github.com/gin-contrib/cors"
 
-	"github.com/LambdaTest/mould/config"
-	global "github.com/LambdaTest/mould/internal/routes/global"
-	v1 "github.com/LambdaTest/mould/internal/routes/v1"
-	globalConfig "github.com/LambdaTest/mould/pkg/global"
-	"github.com/LambdaTest/mould/pkg/ws"
 	"github.com/gin-gonic/gin"
+	config "github.com/kanhaiya15/GoLangFMT/cfg"
+	global "github.com/kanhaiya15/GoLangFMT/internal/routes/global"
+	v1 "github.com/kanhaiya15/GoLangFMT/internal/routes/v1"
+	globalConfig "github.com/kanhaiya15/GoLangFMT/pkg/global"
+	"github.com/kanhaiya15/GoLangFMT/pkg/ws"
 )
 
-// Setup initializes all crons on service startup
-func StartAPIServer(config *config.Config, ctx context.Context, wg *sync.WaitGroup, logger lumber.Logger) error {
+// StartAPIServer Setup initializes all crons on service startup
+func StartAPIServer(ctx context.Context, config *config.Config, wg *sync.WaitGroup, logger lumber.Logger) error {
 	defer wg.Done()
 
 	// set gin to release mode
@@ -80,7 +80,7 @@ func StartAPIServer(config *config.Config, ctx context.Context, wg *sync.WaitGro
 
 }
 
-func Setup(config *config.Config, ctx context.Context, wg *sync.WaitGroup, logger lumber.Logger) error {
+func Setup(ctx context.Context, config *config.Config, wg *sync.WaitGroup, logger lumber.Logger) error {
 	logger.Debugf("Starting API server")
 
 	var policy = backoff.NewExponential(
@@ -106,7 +106,7 @@ func Setup(config *config.Config, ctx context.Context, wg *sync.WaitGroup, logge
 			}
 			return nil
 		default:
-			err := StartAPIServer(config, ctx, wg, logger)
+			err := StartAPIServer(ctx, config, wg, logger)
 			if err != nil {
 				logger.Errorf("API server start error: %s", err)
 				logger.Warnf("Restarting api server")

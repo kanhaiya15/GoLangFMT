@@ -12,12 +12,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/LambdaTest/mould/config"
-	"github.com/LambdaTest/mould/pkg/cron"
-	"github.com/LambdaTest/mould/pkg/global"
-	"github.com/LambdaTest/mould/pkg/http"
-	"github.com/LambdaTest/mould/pkg/lumber"
 	"github.com/joho/godotenv"
+	config "github.com/kanhaiya15/GoLangFMT/cfg"
+	"github.com/kanhaiya15/GoLangFMT/internal/db/sqldb"
+	"github.com/kanhaiya15/GoLangFMT/pkg/global"
+	"github.com/kanhaiya15/GoLangFMT/pkg/http"
+	"github.com/kanhaiya15/GoLangFMT/pkg/lumber"
 	"github.com/spf13/cobra"
 )
 
@@ -42,7 +42,7 @@ func run(cmd *cobra.Command, args []string) {
 	defer cancel()
 
 	// timeout in seconds
-	const GRACEFUL_TIMEOUT = 5000 * time.Millisecond
+	const GracefulTimeout = 5000 * time.Millisecond
 
 	// a WaitGroup for the goroutines to tell us they've stopped
 	wg := sync.WaitGroup{}
@@ -55,9 +55,9 @@ func run(cmd *cobra.Command, args []string) {
 
 	cfg, err := config.Load(cmd)
 	if err != nil {
-		fmt.Errorf("Failed to load config: " + err.Error())
+		fmt.Printf("Failed to load config: %v\n", err.Error())
 	}
-
+	fmt.Printf("cfg : %+v", cfg)
 	// patch logconfig file location with root level log file location
 	if cfg.LogFile != "" {
 		cfg.LogConfig.FileLocation = filepath.Join(cfg.LogFile, "lt.log")
@@ -73,12 +73,13 @@ func run(cmd *cobra.Command, args []string) {
 
 	wg.Add(1)
 	// setup http server
-	go http.Setup(cfg, ctx, &wg, logger)
+	go http.Setup(ctx, cfg, &wg, logger)
 
-	wg.Add(1)
+	// wg.Add(1)
 	// setup scheduler
-	go cron.Setup(cfg, ctx, &wg, logger)
-
+	// go cron.Setup(ctx, cfg, &wg, logger)
+	wg.Add(1)
+	go sqldb.Setup(ctx, cfg, &wg, logger)
 	// listen for C-c
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
@@ -107,7 +108,7 @@ func run(cmd *cobra.Command, args []string) {
 			select {
 			case <-done:
 				logger.Debugf("Go routines exited within timeout")
-			case <-time.After(GRACEFUL_TIMEOUT):
+			case <-time.After(GracefulTimeout):
 				logger.Errorf("Graceful timeout exceeded. Brutally killing the application")
 			}
 

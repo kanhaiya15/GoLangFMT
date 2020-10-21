@@ -1,4 +1,4 @@
-module github.com/LambdaTest/mould
+module github.com/kanhaiya15/GoLangFMT
 
 go 1.13
 
@@ -11,6 +11,7 @@ require (
 	github.com/gobuffalo/packr v1.30.1 // indirect
 	github.com/gobuffalo/packr/v2 v2.8.0 // indirect
 	github.com/gorilla/websocket v1.4.2
+	github.com/jinzhu/gorm v1.9.16
 	github.com/joho/godotenv v1.3.0
 	github.com/karrick/godirwalk v1.15.5 // indirect
 	github.com/lestrrat-go/backoff v1.0.0
@@ -25,4 +26,7 @@ require (
 	golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a // indirect
 	golang.org/x/sys v0.0.0-20200323222414-85ca7c5b95cd // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
+	gorm.io/driver/mysql v1.0.2
+	gorm.io/gorm v1.20.4
+	honnef.co/go/tools v0.0.1-2019.2.3
 )

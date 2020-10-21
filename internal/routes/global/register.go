@@ -3,7 +3,7 @@ package global
 import (
 	"net/http"
 
-	"github.com/LambdaTest/mould/pkg/lumber"
+	"github.com/kanhaiya15/GoLangFMT/pkg/lumber"
 	"github.com/gin-gonic/gin"
 )
 

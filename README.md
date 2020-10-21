@@ -9,11 +9,11 @@ project can live in any directory on your local system.
 
 
 ### Using this boilerplate
-- Visit https://github.com/LambdaTest/mould
+- Visit https://github.com/kanhaiya15/GoLangFMT
 - Click `Use this template` to create a new repository
 - Git clone your new repo
 - After cloning, add this repo to git remote of your project to regularly receive improvements.
-  > Eg. `git remote add template https://github.com/LambdaTest/mould`
+  > Eg. `git remote add template https://github.com/kanhaiya15/GoLangFMT`
 - Then to update your repo with this app, fire `git pull template master`
 
 ## Building

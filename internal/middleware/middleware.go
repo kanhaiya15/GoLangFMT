@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/LambdaTest/mould/pkg/global"
-	"github.com/LambdaTest/mould/pkg/lumber"
+	"github.com/kanhaiya15/GoLangFMT/pkg/global"
+	"github.com/kanhaiya15/GoLangFMT/pkg/lumber"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 )

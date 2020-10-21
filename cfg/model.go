@@ -1,6 +1,6 @@
-package config
+package cfg
 
-import "github.com/LambdaTest/mould/pkg/lumber"
+import "github.com/kanhaiya15/GoLangFMT/pkg/lumber"
 
 // Model definition for configuration
 
@@ -17,9 +17,11 @@ type Config struct {
 	Verbose         bool
 }
 
+// DBConfig the application's DBConfig
 type DBConfig struct {
 	Host     string `json:"host"`
 	Port     string `json:"port"`
 	User     string `json:"user"`
 	Password string `json:"password"`
+	Name     string `json:"name"`
 }
