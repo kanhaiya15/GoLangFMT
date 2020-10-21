@@ -1,0 +1,117 @@
+kind: pipeline
+type: docker
+name: Build
+
+workspace:
+  base: /mould
+  path: ${DRONE_REPO_NAME}
+
+trigger:
+  branch:
+    include:
+      - stage
+      - master
+  event:
+    - pull_request
+    - push
+
+steps:
+  - name: build
+    image: golang:latest
+    volumes:
+      - name: cache
+        path: /data
+    commands:
+      - OS=$(echo "linux freebsd darwin windows")
+      - for os in $${OS}; do
+      - rm -rf /data/build/$${os}_64 /data/$${os}_32
+      - mkdir -p /data/build/$${os}_64 /data/build/$${os}_32
+      - GOOS=$${os} GOARCH=amd64 go build -o /data/build/$${os}/64bit/mould main.go
+      - GOOS=$${os} GOARCH=386 go build -o /data/build/$${os}/32bit/mould main.go
+      - done
+      - cat pkg/global/version.go | grep 'BINARY_VERSION' | awk '{print $4}' | sed 's/"//g' | tee /data/version
+
+volumes:
+  - name: cache
+    host:
+      path: /home/ubuntu/do-not-delete/build/${DRONE_REPO_NAME}/${DRONE_COMMIT}
+
+---
+kind: pipeline
+type: docker
+name: Deploy
+
+depends_on:
+  - Build
+
+clone:
+  disable: true
+
+trigger:
+  branch:
+    include:
+      - stage
+      - master
+  event:
+    include:
+      - push
+
+steps:
+  # this is just a explanatory step to demonstrate use of cached library
+  - name: Verify the version
+    image: ubuntu
+    commands:
+      - cat /data/version
+    volumes:
+      - name: cache
+        path: /data
+  - name: push and invalidate
+    image: ltteam/ubuntu-awscli-jq
+    volumes:
+      - name: cache
+        path: /data
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_access_key_id
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret_access_key
+      AWS_DEFAULT_REGION:
+        from_secret: ${DRONE_COMMIT_BRANCH}-region
+      BUCKET:
+        from_secret: ${DRONE_COMMIT_BRANCH}-bucket
+      DISTRIBUTION:
+        from_secret: ${DRONE_COMMIT_BRANCH}-cloudfront-distribution
+    commands:
+      - mv /data/build/darwin /data/build/mac
+      - aws s3 cp /data/build/ s3://$BUCKET/mould/alpha/ --recursive --acl public-read
+      - invalidateid=$(aws cloudfront create-invalidation --distribution-id $DISTRIBUTION --paths "/tunnel/*" | grep "Id" | cut -d '"' -f 4)
+      - echo $invalidateid
+      - aws cloudfront wait invalidation-completed --id $invalidateid --distribution-id $DISTRIBUTION
+
+  - name: notify
+    image: plugins/slack
+    clone:
+      disable: true
+    settings:
+      webhook:
+        from_secret: slack_webhook_url
+      channel: tunnel-alerts
+      link_names: true
+      template: >
+        {{#success build.status}}
+          ✅ Build #{{build.number}} of `{{repo.name}}` succeeded.
+          📝 Commit by {{build.author}} on `{{build.branch}}`
+          🌐 {{ build.link }}
+        {{else}}
+          ❌ Build #{{build.number}} of `{{repo.name}}` failed.
+          📝 Commit by {{build.author}} on `{{build.branch}}`
+          🌐 {{ build.link }}
+        {{/success}}
+
+volumes:
+  - name: certificates
+    host:
+      path: /home/ubuntu/do-not-delete/certificates
+  - name: cache
+    host:
+      path: /home/ubuntu/do-not-delete/build/${DRONE_REPO_NAME}/${DRONE_COMMIT}
